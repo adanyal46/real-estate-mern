@@ -17,6 +17,7 @@ import {
 	signInStart,
 	signInSuccess,
 } from '../redux/user/userSlice'
+import OAuth from '../components/OAuth'
 
 function SignIn() {
 	const dispatch = useDispatch()
@@ -82,6 +83,7 @@ function SignIn() {
 					>
 						Sign In
 					</Button>
+					<OAuth navigate={navigate} />
 					<Typography.Text className="fs-15">
 						Not an account ? <Link to={'/sign-in'}>Sign up</Link>
 					</Typography.Text>
