@@ -1,14 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Rubik+Doodle+Shadow&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rowdies:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+2:wght@400;500;600;700&display=swap');
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Jost', sans-serif;
-
+  font-family: 'M PLUS 2', sans-serif !important;
+}
+a{
+  color: #121212;
 }
 body{
-
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 .doodle{
-  font-family: 'Rubik Doodle Shadow', serif !important;
+  font-family: 'Rowdies', sans-serif !important;
+}
+.justify-between{
+  justify-content: space-between;
+}
+.w-100{
+  width: 100%;
+}
+.fs-16{
+  font-size: 16px !important;
+}
+.fs-15{
+  font-size: 15px !important;
+}
+/* header css */
+.custom__header{
+  background-color: #ffffff;
+  box-shadow:100px 100px 80px rgba(0, 0, 0, 0.07) !important;
 }
