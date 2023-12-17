@@ -1,8 +1,37 @@
-import { Button, Card, Flex, Form, Input, Space, Typography } from 'antd'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import {
+	Button,
+	Card,
+	Flex,
+	Form,
+	Input,
+	Space,
+	Typography,
+	message,
+} from 'antd'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 function SignUp() {
+	const [loading, setLoading] = useState(false)
+	let [form] = Form.useForm()
+	const navigate = useNavigate()
+	const handleSubmit = async values => {
+		try {
+			setLoading(true)
+			const response = await axios.post('/api/auth/sign-up', values)
+			setLoading(false)
+			message.success(response.data.message)
+			form.resetFields()
+			navigate('/sign-in')
+		} catch (error) {
+			if (error && error.response && error.response.data) {
+				message.error(error.response.data.message)
+			}
+
+			setLoading(false)
+		}
+	}
 	return (
 		<Flex align="center" style={{ minHeight: 'calc(100vh - 65px)' }}>
 			<Card style={{ maxWidth: '600px', width: '100%', marginInline: 'auto' }}>
@@ -15,6 +44,8 @@ function SignUp() {
 					</Typography.Text>
 				</Space.Compact>
 				<Form
+					onFinish={handleSubmit}
+					form={form}
 					style={{ marginTop: '20px' }}
 					autoComplete="false"
 					layout="vertical"
@@ -29,6 +60,8 @@ function SignUp() {
 						<Input.Password size="large" placeholder="Password" />
 					</Form.Item>
 					<Button
+						loading={loading}
+						htmlType="submit"
 						style={{ marginBlock: '10px' }}
 						size="large"
 						type="primary"
