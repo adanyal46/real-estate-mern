@@ -28,6 +28,9 @@ import {
 	deleteUserFailure,
 	deleteUserStart,
 	deleteUserSuccess,
+	logOutFailure,
+	logOutStart,
+	logOutSuccess,
 	updateUserFailure,
 	updateUserStart,
 	updateUserSuccess,
@@ -89,7 +92,6 @@ function Profile() {
 	}
 
 	const handleDeleteAccount = async () => {
-		console.log('click')
 		dispatch(deleteUserStart())
 		try {
 			let response = await axios.delete(
@@ -101,6 +103,17 @@ function Profile() {
 		} catch (error) {
 			const message = error.response?.data?.message || error.message
 			dispatch(deleteUserFailure(message))
+		}
+	}
+	const handleLogOut = async () => {
+		dispatch(logOutStart())
+		try {
+			let response = await axios.post(`/api/auth/sign-out`, {})
+			dispatch(logOutSuccess())
+			message.success(response.data)
+		} catch (error) {
+			const message = error.response?.data?.message || error.message
+			dispatch(logOutFailure(message))
 		}
 	}
 	return (
@@ -160,8 +173,16 @@ function Profile() {
 						Delete Account
 					</Button>
 				</Popconfirm>
-
-				<Typography.Link type="danger">Sign Out</Typography.Link>
+				<Popconfirm
+					title="Are you sure you want to Signout your account?"
+					onConfirm={handleLogOut}
+					okText="Yes"
+					cancelText="No"
+				>
+					<Button style={{ color: '#ff4d4f' }} type="link">
+						Sign Out
+					</Button>
+				</Popconfirm>
 			</Flex>
 		</div>
 	)
