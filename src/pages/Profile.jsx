@@ -156,9 +156,11 @@ function Profile() {
 						<Button loading={loading} type="primary" htmlType="submit" block>
 							Update Profile
 						</Button>
-						<Button style={{ background: 'green' }} type="primary" block>
-							Create Listing
-						</Button>
+						<Link to={'/listing'}>
+							<Button style={{ background: 'green' }} type="primary" block>
+								Create Listing
+							</Button>
+						</Link>
 					</Space>
 				</Form>
 			</Card>
