@@ -4,10 +4,8 @@ import {
 	Card,
 	Flex,
 	Form,
-	Image,
 	Input,
 	Popconfirm,
-	Progress,
 	Space,
 	Typography,
 	Upload,
@@ -35,6 +33,7 @@ import {
 	updateUserStart,
 	updateUserSuccess,
 } from '../redux/user/userSlice'
+import ListingList from '../components/ListingList'
 let fileUrl = null
 function Profile() {
 	const { currentUser, loading, error } = useSelector(state => state.user)
@@ -120,7 +119,7 @@ function Profile() {
 		<div style={{ maxWidth: '500px', marginInline: 'auto', marginTop: '20px' }}>
 			<Card
 				title={
-					<Typography.Title level={3} className="my-0">
+					<Typography.Title level={4} className="my-0">
 						Profile Setting
 					</Typography.Title>
 				}
@@ -186,6 +185,7 @@ function Profile() {
 					</Button>
 				</Popconfirm>
 			</Flex>
+			<ListingList />
 		</div>
 	)
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Row,
 	Col,
@@ -23,8 +23,10 @@ import {
 import { app } from '../firebase'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
-function Listing() {
+import { useParams } from 'react-router-dom'
+function UpdateListing() {
 	let [form] = Form.useForm()
+	const params = useParams()
 	const { currentUser } = useSelector(state => state.user)
 	const [fileList, setFileList] = useState([])
 	const [loading, setLoading] = useState(false)
@@ -32,6 +34,21 @@ function Listing() {
 	const [formData, setFormData] = useState({
 		imageUrls: [],
 	})
+	useEffect(() => {
+		fetchUserListing()
+		return () => {}
+	}, [])
+	const fetchUserListing = async () => {
+		const listing = await axios.get(`/api/listing/get/${params.id}`)
+		form.setFieldsValue(listing.data)
+		setFormData({ imageUrls: listing.data.imageUrls })
+		let imageData = listing?.data?.imageUrls.map((item, index) => ({
+			id: index,
+			url: item,
+		}))
+		setFileList(imageData)
+	}
+
 	const handleFileUpload = async () => {
 		let files = []
 		if (fileList.length > 0) {
@@ -122,7 +139,7 @@ function Listing() {
 		>
 			<div className="container">
 				<Flex justify="center" style={{ paddingBottom: '20px' }}>
-					<Typography.Title level={2}>Create a listing</Typography.Title>
+					<Typography.Title level={2}>Update a listing</Typography.Title>
 				</Flex>
 				<Row gutter={[24, 24]}>
 					<Col xs={24} md={15}>
@@ -223,4 +240,4 @@ function Listing() {
 	)
 }
 
-export default Listing
+export default UpdateListing

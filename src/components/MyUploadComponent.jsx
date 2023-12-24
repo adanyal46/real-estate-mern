@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
-import { Upload, Button, Typography, Space } from 'antd'
+import { Upload, Button, Typography, Space, Flex } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 
-const MyUploadComponent = ({ fileList, setFileList }) => {
-	const [imageUrls, setImageUrls] = useState([])
-
+const MyUploadComponent = ({
+	fileList,
+	setFileList,
+	handleUpload,
+	imageUrls,
+	setImageUrls,
+}) => {
 	const handlePreview = file => {
 		const reader = new FileReader()
 		reader.readAsDataURL(file)
@@ -39,19 +43,24 @@ const MyUploadComponent = ({ fileList, setFileList }) => {
 				onPreview={handlePreview}
 				beforeUpload={() => false}
 			>
-				{fileList.length < 6 && (
-					<div>
-						<UploadOutlined style={{ fontSize: '24px' }} />
-						<div
-							style={{
-								marginTop: 8,
-							}}
-						>
-							Upload
+				<Space>
+					{fileList.length < 6 && (
+						<div>
+							<UploadOutlined style={{ fontSize: '24px' }} />
+							<div
+								style={{
+									marginTop: 8,
+								}}
+							>
+								Upload
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+				</Space>
 			</Upload>
+			<Flex justify="end">
+				<Button onClick={handleUpload}>Click to upload</Button>
+			</Flex>
 			<div>
 				{imageUrls.map((url, index) => (
 					<img
