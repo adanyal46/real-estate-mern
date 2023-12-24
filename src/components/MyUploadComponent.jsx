@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { Upload, Button, Typography, Space } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 
-const MyUploadComponent = () => {
-	const [fileList, setFileList] = useState([])
+const MyUploadComponent = ({ fileList, setFileList }) => {
 	const [imageUrls, setImageUrls] = useState([])
 
 	const handlePreview = file => {
@@ -15,8 +14,9 @@ const MyUploadComponent = () => {
 	}
 
 	const handleChange = ({ file, fileList: newFileList }) => {
-		setFileList(newFileList)
-		if (file.status === 'done') {
+		const limitedFileList = newFileList.slice(0, 6)
+		setFileList(limitedFileList)
+		if (file.status === 'done' && limitedFileList.length <= 6) {
 			handlePreview(file.originFileObj)
 		}
 	}
