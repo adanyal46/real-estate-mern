@@ -6,10 +6,12 @@ import {
 	Form,
 	Image,
 	Input,
+	Popconfirm,
 	Progress,
 	Space,
 	Typography,
 	Upload,
+	message,
 } from 'antd'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +25,9 @@ import {
 import { app } from '../firebase'
 import axios from 'axios'
 import {
+	deleteUserFailure,
+	deleteUserStart,
+	deleteUserSuccess,
 	updateUserFailure,
 	updateUserStart,
 	updateUserSuccess,
@@ -83,7 +88,21 @@ function Profile() {
 		}
 	}
 
-	console.log(loading)
+	const handleDeleteAccount = async () => {
+		console.log('click')
+		dispatch(deleteUserStart())
+		try {
+			let response = await axios.delete(
+				`/api/user/delete/${currentUser._id}`,
+				{}
+			)
+			dispatch(deleteUserSuccess())
+			message.success(response.data)
+		} catch (error) {
+			const message = error.response?.data?.message || error.message
+			dispatch(deleteUserFailure(message))
+		}
+	}
 	return (
 		<div style={{ maxWidth: '500px', marginInline: 'auto', marginTop: '20px' }}>
 			<Card
@@ -131,7 +150,17 @@ function Profile() {
 				</Form>
 			</Card>
 			<Flex justify="space-between" style={{ marginTop: '15px' }}>
-				<Typography.Link type="danger">Delete Account</Typography.Link>
+				<Popconfirm
+					title="Are you sure you want to delete your account?"
+					onConfirm={handleDeleteAccount}
+					okText="Yes"
+					cancelText="No"
+				>
+					<Button style={{ color: '#ff4d4f' }} type="link">
+						Delete Account
+					</Button>
+				</Popconfirm>
+
 				<Typography.Link type="danger">Sign Out</Typography.Link>
 			</Flex>
 		</div>

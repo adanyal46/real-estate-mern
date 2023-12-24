@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 function AppHeader() {
 	const { currentUser } = useSelector(state => state.user)
-	console.log(currentUser)
 	return (
 		<Layout.Header className="custom__header">
 			<Space className="justify-between w-100" wrap>
