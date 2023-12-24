@@ -85,7 +85,7 @@ function SignIn() {
 					</Button>
 					<OAuth navigate={navigate} />
 					<Typography.Text className="fs-15">
-						Not an account ? <Link to={'/sign-in'}>Sign up</Link>
+						Not an account ? <Link to={'/sign-up'}>Sign up</Link>
 					</Typography.Text>
 				</Form>
 			</Card>

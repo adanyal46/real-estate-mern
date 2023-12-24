@@ -12,7 +12,7 @@ import {
 	Upload,
 } from 'antd'
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
 	getDownloadURL,
@@ -21,56 +21,69 @@ import {
 	uploadBytesResumable,
 } from 'firebase/storage'
 import { app } from '../firebase'
+import axios from 'axios'
+import {
+	updateUserFailure,
+	updateUserStart,
+	updateUserSuccess,
+} from '../redux/user/userSlice'
 let fileUrl = null
 function Profile() {
+	const { currentUser, loading, error } = useSelector(state => state.user)
 	const [fileList, setFileList] = useState([])
-	const [downloadUrl, setDownloadUrl] = useState([])
-	const { currentUser } = useSelector(state => state.user)
+	const dispatch = useDispatch()
 
-	let initialValues = {
+	const initialValues = {
 		username: currentUser.username,
 		email: currentUser.email,
 	}
+
 	const handleChange = ({ fileList }) => setFileList(fileList)
 	const avatarSrc =
 		fileList.length > 0
 			? URL.createObjectURL(fileList.at(-1).originFileObj)
 			: currentUser.avatar
+	const uploadFile = async file => {
+		const storage = getStorage(app)
+		const fileName = `${new Date().getTime()}${file.name}`
+		const storageRef = ref(storage, fileName)
+		const uploadTask = uploadBytesResumable(storageRef, file)
 
-	const handleSubmit = async values => {
-		console.log(values)
-		const formData = new FormData()
-		Object.keys(values).forEach(key => {
-			formData.append(key, values[key])
+		return new Promise((resolve, reject) => {
+			uploadTask.on(
+				'state_changed',
+				snapshot => {
+					// Handle progress, e.g., updating a progress bar
+				},
+				error => reject(error),
+				async () => {
+					const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref)
+					resolve(downloadUrl)
+				}
+			)
 		})
+	}
+	const handleSubmit = async values => {
+		dispatch(updateUserStart())
+		try {
+			if (fileList.length > 0) {
+				const file = fileList[0].originFileObj
+				const downloadUrl = await uploadFile(file)
+				values['avatar'] = downloadUrl
+			}
 
-		if (fileList.length > 0) {
-			await handleFileUpload(fileList.at(-1).originFileObj)
-			formData.append('avatar', downloadUrl)
+			const response = await axios.post(
+				`/api/user/update/${currentUser._id}`,
+				values
+			)
+			dispatch(updateUserSuccess(response.data))
+		} catch (error) {
+			const message = error.response?.data?.message || error.message
+			dispatch(updateUserFailure(message))
 		}
 	}
 
-	const handleFileUpload = file => {
-		const storage = getStorage(app)
-		const fileName = new Date().getTime() + file.name
-		const storageRef = ref(storage, fileName)
-		const uploadTask = uploadBytesResumable(storageRef, file)
-		uploadTask.on(
-			'state_changed',
-			snapshot => {
-				const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-			},
-			error => {
-				console.log(error)
-			},
-			() =>
-				getDownloadURL(uploadTask.snapshot.ref).then(downloadUrl => {
-					setDownloadUrl(downloadUrl)
-				})
-		)
-	}
-
-	console.log(downloadUrl)
+	console.log(loading)
 	return (
 		<div style={{ maxWidth: '500px', marginInline: 'auto', marginTop: '20px' }}>
 			<Card
@@ -88,21 +101,7 @@ function Profile() {
 						listType="picture"
 						beforeUpload={() => false} // Prevent automatic upload
 					>
-						<Avatar
-							style={{ border: '1px solid #ccc' }}
-							src={
-								<Image
-									preview={false}
-									src={avatarSrc}
-									alt="avatar"
-									style={{
-										width: 100,
-										height: 100,
-									}}
-								/>
-							}
-							size={100}
-						/>
+						<Avatar src={avatarSrc} size={100} />
 					</Upload>
 				</Flex>
 
@@ -118,8 +117,11 @@ function Profile() {
 					<Form.Item name={'email'} rules={[{ type: 'email', required: true }]}>
 						<Input placeholder="Enter your email" />
 					</Form.Item>
+					<Form.Item name={'password'} rules={[{ required: false }]}>
+						<Input.Password placeholder="Enter your password" />
+					</Form.Item>
 					<Space direction="vertical" className="w-100">
-						<Button type="primary" htmlType="submit" block>
+						<Button loading={loading} type="primary" htmlType="submit" block>
 							Update Profile
 						</Button>
 						<Button style={{ background: 'green' }} type="primary" block>
